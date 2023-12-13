@@ -63,7 +63,7 @@ router.get('/:_id/logs', async(req, res, next)=>{
         let finalResult = {
             ...user,
             count: logs.length,
-            logs: logs.map((log)=>{
+            log: logs.map((log)=>{
                 delete log._id;
                 log.date = new Date(log.date).toDateString();
                 return log;
@@ -85,6 +85,7 @@ router.post('/:_id/exercises', async (req, res, next) => {
             next('user not found');
         }
         let obj = {user_id, description, duration}
+        obj.user_id||= _id;
         if(date){
             obj.date = new Date(date);
         }
@@ -92,7 +93,11 @@ router.post('/:_id/exercises', async (req, res, next) => {
         let result = await exercise.save();
         let finalResult = {
             ...user, 
-            ...result._doc
+            _id,    
+            description,
+            duration:result?._doc?.duration,
+            date: new Date(result?._doc?.date).toDateString()
+            
         };
         finalResult.date = new Date(finalResult.date).toDateString();
         res.json(finalResult);
